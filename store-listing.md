@@ -86,5 +86,5 @@ https://github.com/danwoodruff/bookmark-gardening-manager
 ---
 
 ### Homepage URL
-https://danwoodruffconsulting.com/bookmark-gardening-manager
-(replace with your landing page URL once hosted)
+https://danwoodruffconsulting.com/bookmark-gardening-manager/
+(or use GitHub Pages: https://danwoodruffconsulting.github.io/bookmark-gardening-manager/)
