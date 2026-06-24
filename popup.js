@@ -122,10 +122,11 @@ document.getElementById('btn-donate').addEventListener('click', e => {
   chrome.tabs.create({ url: 'https://square.link/u/edbLSm7R', active: true });
 });
 
-const websiteUrl = 'https://danwoodruffconsulting.github.io/bookmark-gardening-manager/#legal';
-['btn-website', 'btn-website-title', 'btn-website-footer'].forEach(id => {
+const websiteBase  = 'https://danwoodruffconsulting.github.io/bookmark-gardening-manager/';
+const websiteLegal = websiteBase + '#legal';
+[['btn-website', websiteBase], ['btn-website-title', websiteBase], ['btn-website-footer', websiteLegal]].forEach(([id, url]) => {
   const el = document.getElementById(id);
-  if (el) el.addEventListener('click', e => { e.preventDefault(); chrome.tabs.create({ url: websiteUrl, active: true }); });
+  if (el) el.addEventListener('click', e => { e.preventDefault(); chrome.tabs.create({ url, active: true }); });
 });
 
 const btnAudit          = document.getElementById('btn-audit');
