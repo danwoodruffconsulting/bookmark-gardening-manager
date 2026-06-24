@@ -122,9 +122,10 @@ document.getElementById('btn-donate').addEventListener('click', e => {
   chrome.tabs.create({ url: 'https://square.link/u/edbLSm7R', active: true });
 });
 
-document.getElementById('btn-website').addEventListener('click', e => {
-  e.preventDefault();
-  chrome.tabs.create({ url: 'https://danwoodruffconsulting.github.io/bookmark-gardening-manager/#legal', active: true });
+const websiteUrl = 'https://danwoodruffconsulting.github.io/bookmark-gardening-manager/#legal';
+['btn-website', 'btn-website-title', 'btn-website-footer'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', e => { e.preventDefault(); chrome.tabs.create({ url: websiteUrl, active: true }); });
 });
 
 const btnAudit          = document.getElementById('btn-audit');
@@ -822,3 +823,47 @@ function esc(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+// ── Resizable popup (remembers size) ────────────────────────────────────────
+(function initResize() {
+  // Width is fixed; only the height is resizable. Chrome caps popups at 600 tall.
+  const MIN_H = 300, MAX_H = 600;
+  const SIZE_KEY = 'popupHeight';
+  const handle = document.getElementById('resize-handle');
+  if (!handle) return;
+
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+  // Restore the last height the user picked.
+  chrome.storage.local.get(SIZE_KEY).then(stored => {
+    const h = stored[SIZE_KEY];
+    if (h) document.body.style.height = clamp(h, MIN_H, MAX_H) + 'px';
+  });
+
+  let startY, startH, dragging = false;
+
+  handle.addEventListener('pointerdown', e => {
+    dragging = true;
+    startY = e.clientY;
+    startH = document.body.getBoundingClientRect().height;
+    handle.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+
+  handle.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const h = clamp(startH + (e.clientY - startY), MIN_H, MAX_H);
+    document.body.style.height = h + 'px';
+  });
+
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging = false;
+    try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+    const h = Math.round(document.body.getBoundingClientRect().height);
+    chrome.storage.local.set({ [SIZE_KEY]: h });
+  }
+
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+})();

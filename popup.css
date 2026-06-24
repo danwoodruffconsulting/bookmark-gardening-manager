@@ -19,11 +19,13 @@ body {
   color: var(--text);
   background: var(--bg);
   width: 420px;
+  height: 580px;
   min-height: 300px;
-  max-height: 580px;
+  max-height: 600px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 header {
@@ -36,6 +38,19 @@ header {
 }
 header .header-icon { font-size: 20px; line-height: 1; }
 header h1 { font-size: 15px; font-weight: 600; letter-spacing: .01em; }
+.header-about {
+  font-size: 20px;
+  line-height: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background .15s;
+}
+.header-about:hover { background: rgba(255,255,255,0.2); }
+.header-title-link { color: inherit; text-decoration: none; }
+.header-title-link:hover { text-decoration: underline; }
 .donate-btn {
   margin-left: auto;
   padding: 4px 10px;
@@ -329,3 +344,26 @@ header h1 { font-size: 15px; font-weight: 600; letter-spacing: .01em; }
   text-decoration: none;
 }
 .footer-link:hover { color: var(--blue); text-decoration: underline; }
+
+/* ── RESIZE GRIP ────────────── */
+#resize-handle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 10px;
+  cursor: ns-resize;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+#resize-handle::before {
+  content: "";
+  width: 34px;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--border);
+}
+#resize-handle:hover::before { background: var(--muted); }
