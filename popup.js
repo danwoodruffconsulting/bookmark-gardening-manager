@@ -5,6 +5,8 @@ const INSTALL_KEY = 'installDate';
 const BATCH = 6; // concurrent URL checks
 const AUDIT_SESSION_KEY  = 'auditSession';
 const UNUSED_SESSION_KEY = 'unusedSession';
+const REPORT_SESSION_KEY = 'reportSession';
+const UI_STATE_KEY       = 'uiState';
 
 // ── Login-redirect detection ───────────────────────────────────────────────
 const LOGIN_PATH_RE = /\/(login|signin|sign-in|authenticate|sso|auth\/|session\/new|users\/sign_in|account\/login)(?:[/?#]|$)/i;
@@ -27,12 +29,19 @@ function isLoginRedirect(origUrl, finalUrl) {
 }
 
 // ── Tab switching ──────────────────────────────────────────────────────────
+let activeTabName = 'audit';
+
+function activateTab(name) {
+  if (!document.getElementById(`panel-${name}`)) return;
+  activeTabName = name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${name}`));
+}
+
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById(`panel-${tab.dataset.tab}`).classList.add('active');
+    activateTab(tab.dataset.tab);
+    saveUiState();
   });
 });
 
@@ -163,11 +172,12 @@ function makeBmItem(bm, statusClass, badgeClass, badgeText) {
   li.innerHTML = `
     <input type="checkbox" checked data-id="${bm.id}">
     <div class="bm-info">
-      <div class="bm-title" title="${esc(bm.title)}">${esc(bm.title || '(no title)')}</div>
+      <a class="bm-title bm-link" href="${esc(bm.url)}" title="${esc(bm.url)}">${esc(bm.title || '(no title)')}</a>
       <div class="bm-url" title="${esc(bm.url)}">${esc(bm.url)}</div>
     </div>
     <button class="btn-open-url" title="Open in new tab">↗</button>
     <span class="bm-badge ${badgeClass}">${badgeText}</span>`;
+  li.querySelector('.bm-link').addEventListener('click', e => { e.preventDefault(); openUrl(bm.url); });
   li.querySelector('.btn-open-url').addEventListener('click', () => openUrl(bm.url));
   return li;
 }
@@ -379,11 +389,41 @@ const btnDeleteUnused = document.getElementById('btn-delete-unused');
 const unusedSelectAll = document.getElementById('unused-select-all');
 const unusedList = document.getElementById('unused-list');
 const usageEmpty = document.getElementById('usage-empty');
+const usageStatus = document.getElementById('usage-status');
 
 let unusedBookmarks = [];
 
 function daysSince(ts) {
   return (Date.now() - ts) / 86400000;
+}
+
+function plural(n, word) {
+  return `${n.toLocaleString()} ${word}${n !== 1 ? 's' : ''}`;
+}
+
+// Fill in the live "Tracking N bookmarks over D days" lead-in of the footer note.
+function setTrackingStatus(count, installDate) {
+  if (!usageStatus) return;
+  if (!installDate) {
+    usageStatus.textContent = `Tracking ${plural(count, 'bookmark')}.`;
+    return;
+  }
+  const days = Math.floor(daysSince(installDate));
+  usageStatus.textContent = days < 1
+    ? `Tracking ${plural(count, 'bookmark')} since you installed the extension today.`
+    : `Tracking ${plural(count, 'bookmark')} over the ${plural(days, 'day')} since you installed the extension.`;
+}
+
+async function updateTrackingStatus() {
+  if (!usageStatus) return;
+  try {
+    const [all, installStored] = await Promise.all([
+      getAllBookmarks(),
+      chrome.storage.local.get(INSTALL_KEY),
+    ]);
+    const count = all.filter(bm => bm.url).length;
+    setTrackingStatus(count, installStored[INSTALL_KEY]);
+  } catch (_) {}
 }
 
 async function isUnused(bm, thresholdVal, usage, installDate) {
@@ -425,11 +465,14 @@ function renderUnusedResults() {
     li.innerHTML = `
       <input type="checkbox" checked data-id="${bm.id}">
       <div class="bm-info">
-        <div class="bm-title" title="${esc(bm.title)}">${esc(bm.title || '(no title)')}</div>
+        <a class="bm-title bm-link" href="${esc(bm.url)}" title="${esc(bm.url)}">${esc(bm.title || '(no title)')}</a>
         <div class="bm-url" title="${esc(bm.url)}">${esc(bm.url)}</div>
         <div class="bm-meta">${lastLabel} · ${visitsLabel}</div>
       </div>
+      <button class="btn-open-url" title="Open in new tab">↗</button>
       <span class="bm-badge warn">Unused</span>`;
+    li.querySelector('.bm-link').addEventListener('click', e => { e.preventDefault(); openUrl(bm.url); });
+    li.querySelector('.btn-open-url').addEventListener('click', () => openUrl(bm.url));
     unusedList.appendChild(li);
   });
   syncSelectAll(unusedSelectAll, unusedList);
@@ -486,6 +529,7 @@ btnScanUnused.addEventListener('click', async () => {
   }});
 
   renderUnusedResults();
+  setTrackingStatus(all.filter(bm => bm.url).length, installStored[INSTALL_KEY]);
   btnScanUnused.disabled = false;
 });
 
@@ -518,6 +562,7 @@ btnDeleteUnused.addEventListener('click', async () => {
     usageCount.textContent = `${unusedBookmarks.length} unused bookmark${unusedBookmarks.length !== 1 ? 's' : ''}`;
     syncSelectAll(unusedSelectAll, unusedList);
   }
+  updateTrackingStatus();
 });
 
 wireSelectAll(unusedSelectAll, unusedList);
@@ -528,12 +573,36 @@ const groupBySel = document.getElementById('group-by');
 const reportResults = document.getElementById('report-results');
 const reportGroups = document.getElementById('report-groups');
 
-btnReport.addEventListener('click', async () => {
-  btnReport.disabled = true;
+// Identifiers of the report cards the user has expanded, so an open folder
+// stays open after the popup closes (e.g. when clicking a bookmark link).
+let reportOpenKeys = new Set();
+
+function saveReportSession() {
+  chrome.storage.session.set({ [REPORT_SESSION_KEY]: {
+    generated: true,
+    groupBy: groupBySel.value,
+    selectedGroupBy: groupBySel.value,
+    openKeys: [...reportOpenKeys],
+    timestamp: Date.now(),
+  }});
+}
+
+// Expand/collapse a report card and remember which groups are open.
+function setGroupOpen(card, open) {
+  const body = card.querySelector('.group-body');
+  const toggle = card.querySelector('.group-toggle');
+  if (!body) return;
+  body.classList.toggle('open', open);
+  if (toggle) toggle.textContent = open ? '▾' : '▸';
+  const key = card.dataset.groupKey;
+  if (key == null) return;
+  if (open) reportOpenKeys.add(key); else reportOpenKeys.delete(key);
+}
+
+async function generateReport(groupBy) {
   reportGroups.innerHTML = '';
   reportResults.classList.add('hidden');
 
-  const groupBy = groupBySel.value;
   const tree = await chrome.bookmarks.getTree();
 
   if (groupBy === 'folder') {
@@ -547,7 +616,22 @@ btnReport.addEventListener('click', async () => {
   }
 
   reportResults.classList.remove('hidden');
+}
+
+btnReport.addEventListener('click', async () => {
+  btnReport.disabled = true;
+  reportOpenKeys = new Set();           // a freshly generated report starts collapsed
+  await generateReport(groupBySel.value);
+  saveReportSession();
   btnReport.disabled = false;
+});
+
+// Remember the dropdown choice even before a report is generated.
+groupBySel.addEventListener('change', () => {
+  chrome.storage.session.get(REPORT_SESSION_KEY).then(stored => {
+    const prev = stored[REPORT_SESSION_KEY] || {};
+    chrome.storage.session.set({ [REPORT_SESSION_KEY]: { ...prev, selectedGroupBy: groupBySel.value } });
+  });
 });
 
 function renderFolderReport(tree) {
@@ -563,6 +647,7 @@ function renderFolderCard(folder, container) {
   const totalLeafs = countLeafs(folder);
   const card = document.createElement('div');
   card.className = 'group-card';
+  card.dataset.groupKey = folder.id;
   card.style.marginLeft = folder.depth * 8 + 'px';
 
   card.innerHTML = `
@@ -579,8 +664,9 @@ function renderFolderCard(folder, container) {
     <div class="group-body">
       <ul>
         ${folder.bookmarks.map(bm => `
-          <li>
+          <li data-id="${bm.id}">
             <a href="${esc(bm.url)}" target="_blank" title="${esc(bm.url)}">${esc(bm.title || bm.url)}</a>
+            <button class="btn-del-item" title="Delete this bookmark" aria-label="Delete this bookmark">✕</button>
           </li>`).join('')}
         ${!folder.bookmarks.length ? '<li style="color:var(--muted)">No bookmarks directly in this folder</li>' : ''}
       </ul>
@@ -588,9 +674,8 @@ function renderFolderCard(folder, container) {
 
   card.querySelector('.group-header').addEventListener('click', (e) => {
     if (e.target.closest('.btn-del-group')) return;
-    card.querySelector('.group-body').classList.toggle('open');
-    card.querySelector('.group-toggle').textContent =
-      card.querySelector('.group-body').classList.contains('open') ? '▾' : '▸';
+    setGroupOpen(card, !card.querySelector('.group-body').classList.contains('open'));
+    saveReportSession();
   });
 
   card.querySelector('.btn-del-group').addEventListener('click', async () => {
@@ -598,15 +683,41 @@ function renderFolderCard(folder, container) {
     try {
       await chrome.bookmarks.removeTree(folder.id);
       card.remove();
+      reportOpenKeys.delete(String(folder.id));
+      saveReportSession();
     } catch (e) {
       alert('Could not delete folder: ' + e.message);
     }
   });
 
+  wireItemDeletes(card);
+  if (reportOpenKeys.has(String(folder.id))) setGroupOpen(card, true);
   container.appendChild(card);
 
   // Recurse into subfolders
   folder.subFolders.forEach(sub => renderFolderCard(sub, container));
+}
+
+// Delegated handler: delete a single bookmark from a report card's list
+function wireItemDeletes(card) {
+  const body = card.querySelector('.group-body');
+  if (!body) return;
+  body.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.btn-del-item');
+    if (!btn) return;
+    e.stopPropagation();
+    const li = btn.closest('li[data-id]');
+    if (!li) return;
+    const id = li.dataset.id;
+    const title = li.querySelector('a')?.textContent || 'this bookmark';
+    if (!confirm(`Delete "${title}"?`)) return;
+    try {
+      await chrome.bookmarks.remove(id);
+      li.remove();
+    } catch (err) {
+      alert('Could not delete bookmark: ' + err.message);
+    }
+  });
 }
 
 function countLeafs(folder) {
@@ -624,6 +735,7 @@ function renderGroupCards(groups, emptyMsg) {
   for (const [label, bms] of groups) {
     const card = document.createElement('div');
     card.className = 'group-card';
+    card.dataset.groupKey = label;
     card.innerHTML = `
       <div class="group-header">
         <div>
@@ -639,14 +751,14 @@ function renderGroupCards(groups, emptyMsg) {
         <ul>
           ${bms.map(bm => `<li data-id="${bm.id}">
             <a href="${esc(bm.url)}" target="_blank" title="${esc(bm.url)}">${esc(bm.title || bm.url)}</a>
+            <button class="btn-del-item" title="Delete this bookmark" aria-label="Delete this bookmark">✕</button>
           </li>`).join('')}
         </ul>
       </div>`;
     card.querySelector('.group-header').addEventListener('click', e => {
       if (e.target.closest('.btn-del-grp')) return;
-      card.querySelector('.group-body').classList.toggle('open');
-      card.querySelector('.group-toggle').textContent =
-        card.querySelector('.group-body').classList.contains('open') ? '▾' : '▸';
+      setGroupOpen(card, !card.querySelector('.group-body').classList.contains('open'));
+      saveReportSession();
     });
     card.querySelector('.btn-del-grp').addEventListener('click', async () => {
       if (!confirm(`Delete all ${bms.length} bookmarks in "${label}"?`)) return;
@@ -654,7 +766,11 @@ function renderGroupCards(groups, emptyMsg) {
         try { await chrome.bookmarks.remove(bm.id); } catch (_) {}
       }
       card.remove();
+      reportOpenKeys.delete(label);
+      saveReportSession();
     });
+    wireItemDeletes(card);
+    if (reportOpenKeys.has(label)) setGroupOpen(card, true);
     reportGroups.appendChild(card);
   }
 }
@@ -809,8 +925,57 @@ async function restoreUnusedSession() {
   renderUnusedResults();
 }
 
-restoreAuditSession();
-restoreUnusedSession();
+async function restoreReportSession() {
+  const stored = await chrome.storage.session.get(REPORT_SESSION_KEY);
+  const session = stored[REPORT_SESSION_KEY];
+  if (!session) return;
+
+  const selected = session.selectedGroupBy || session.groupBy;
+  if (selected) groupBySel.value = selected;
+
+  if (!session.generated) return;
+  reportOpenKeys = new Set((session.openKeys || []).map(String));
+  await generateReport(session.groupBy || groupBySel.value);
+}
+
+// ── UI state: active tab + scroll position ─────────────────────────────────
+const scrollContainers = { audit: auditResults, usage: usageResults, report: reportResults };
+const scrollState = { audit: 0, usage: 0, report: 0 };
+let saveUiTimer = null;
+
+function saveUiState() {
+  chrome.storage.session.set({ [UI_STATE_KEY]: { activeTab: activeTabName, scroll: scrollState } });
+}
+
+function scheduleSaveUiState() {
+  clearTimeout(saveUiTimer);
+  saveUiTimer = setTimeout(saveUiState, 150);
+}
+
+Object.entries(scrollContainers).forEach(([name, el]) => {
+  if (!el) return;
+  el.addEventListener('scroll', () => {
+    scrollState[name] = el.scrollTop;
+    scheduleSaveUiState();
+  });
+});
+
+async function restoreUiState() {
+  const stored = await chrome.storage.session.get(UI_STATE_KEY);
+  const state = stored[UI_STATE_KEY];
+  if (!state) return;
+  if (state.scroll) Object.assign(scrollState, state.scroll);
+  if (state.activeTab) activateTab(state.activeTab);
+  // Restore scroll once the now-visible panel has laid out.
+  const el = scrollContainers[activeTabName];
+  if (el) requestAnimationFrame(() => { el.scrollTop = scrollState[activeTabName] || 0; });
+}
+
+(async function restoreAll() {
+  await Promise.all([restoreAuditSession(), restoreUnusedSession(), restoreReportSession()]);
+  await restoreUiState();
+  updateTrackingStatus();
+})();
 
 // ── Util ──────────────────────────────────────────────────────────────────
 function openUrl(url) {

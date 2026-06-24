@@ -210,6 +210,13 @@ header h1 { font-size: 15px; font-weight: 600; letter-spacing: .01em; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
+a.bm-title {
+  display: block;
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+}
+a.bm-title:hover { color: var(--blue); text-decoration: underline; }
 .bm-url {
   color: var(--muted);
   font-size: 11px;
@@ -283,6 +290,20 @@ header h1 { font-size: 15px; font-weight: 600; letter-spacing: .01em; }
   display: inline-block;
 }
 .group-body li a:hover { text-decoration: underline; }
+.group-body li a { flex: 1; }
+.btn-del-item {
+  flex: none;
+  margin-left: auto;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.btn-del-item:hover { color: #d12; background: rgba(221, 17, 34, 0.08); }
 
 .scan-note {
   font-size: 11px;
