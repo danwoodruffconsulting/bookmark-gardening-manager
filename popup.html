@@ -22,7 +22,7 @@
   <div class="panel active" id="panel-audit">
     <p class="desc">Scan every bookmark and remove ones whose URLs are dead (404, gone, or unreachable).</p>
 
-    <button id="btn-audit" class="btn primary full">Scan for Dead Links</button>
+    <button id="btn-audit" class="btn primary full">Scan for Broken Links</button>
 
     <div id="audit-progress" class="progress-wrap hidden">
       <div class="progress-track"><div id="audit-bar" class="progress-fill"></div></div>
@@ -34,15 +34,32 @@
     <div id="audit-results" class="results hidden">
       <div id="audit-dead-section" class="hidden">
         <div class="results-header">
-          <span id="audit-count" class="count-label"></span>
+          <div class="results-header-left">
+            <span id="audit-count" class="count-label"></span>
+            <label class="select-all-label"><input type="checkbox" id="dead-select-all"> Select all</label>
+          </div>
           <button id="btn-delete-dead" class="btn danger">Remove Dead</button>
         </div>
         <ul id="dead-list" class="bm-list"></ul>
       </div>
+      <div id="audit-slow-section" class="hidden">
+        <div class="section-divider">Timed Out</div>
+        <div class="results-header">
+          <div class="results-header-left">
+            <span id="audit-slow-count" class="count-label"></span>
+            <label class="select-all-label"><input type="checkbox" id="slow-select-all"> Select all</label>
+          </div>
+          <button id="btn-delete-slow" class="btn danger">Remove Timed Out</button>
+        </div>
+        <ul id="slow-list" class="bm-list"></ul>
+      </div>
       <div id="audit-login-section" class="hidden">
         <div class="section-divider">Requires Login</div>
         <div class="results-header">
-          <span id="audit-login-count" class="count-label"></span>
+          <div class="results-header-left">
+            <span id="audit-login-count" class="count-label"></span>
+            <label class="select-all-label"><input type="checkbox" id="login-select-all"> Select all</label>
+          </div>
           <button id="btn-delete-login" class="btn danger">Remove Login-Required</button>
         </div>
         <ul id="login-list" class="bm-list"></ul>
@@ -74,7 +91,10 @@
 
     <div id="usage-results" class="results hidden">
       <div class="results-header">
-        <span id="usage-count" class="count-label"></span>
+        <div class="results-header-left">
+          <span id="usage-count" class="count-label"></span>
+          <label class="select-all-label"><input type="checkbox" id="unused-select-all"> Select all</label>
+        </div>
         <button id="btn-delete-unused" class="btn danger">Remove Unused</button>
       </div>
       <ul id="unused-list" class="bm-list"></ul>
@@ -95,7 +115,10 @@
       <label for="group-by">Group by</label>
       <select id="group-by">
         <option value="folder">Folder</option>
-        <option value="domain">Domain</option>
+        <option value="domain">Website Domain</option>
+        <option value="smart-topic">Smart: By Topic</option>
+        <option value="smart-org">Smart: By Organization</option>
+        <option value="smart-type">Smart: By Site Type</option>
       </select>
     </div>
 
@@ -105,6 +128,10 @@
       <div id="report-groups"></div>
     </div>
   </div>
+
+  <footer class="popup-footer">
+    <a id="btn-website" href="#" class="footer-link">danwoodruffconsulting.github.io &rsaquo; Legal &amp; About</a>
+  </footer>
 
   <script src="popup.js"></script>
 </body>
