@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bookmark Gardening Manager — Icon Generator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 40px 32px;
+    }
+    header { margin-bottom: 32px; }
+    header h1 { font-size: 22px; font-weight: 700; }
+    header p  { color: #64748b; font-size: 13px; margin-top: 6px; max-width: 620px; line-height: 1.6; }
+
+    .section { margin-bottom: 40px; }
+    .section h2 {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: #64748b; margin-bottom: 16px;
+    }
+    .row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-end; }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    canvas { border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,.18); }
+    .card-label { font-size: 12px; color: #475569; font-weight: 600; }
+    .card-sub   { font-size: 11px; color: #94a3b8; }
+
+    .btn {
+      padding: 7px 18px;
+      border: none;
+      border-radius: 6px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn:hover { background: #166534; }
+
+    .instructions {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 13px;
+      line-height: 1.8;
+      max-width: 640px;
+    }
+    .instructions strong { color: #166534; }
+    ol { padding-left: 20px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>✂️ Bookmark Gardening Manager — Icon Generator</h1>
+  <p>Open this file in Chrome. Click each Download button to save the PNG files, then place the extension icons in <code>bookmark_ext/icons/</code> and upload the Square assets to your payment dashboard.</p>
+</header>
+
+<div class="section">
+  <h2>Extension Icons (Chrome Web Store)</h2>
+  <div class="row" id="ext-icons"></div>
+</div>
+
+<div class="section">
+  <h2>Square Payment Profile &amp; Banner</h2>
+  <div class="row" id="square-icons"></div>
+</div>
+
+<div class="section instructions">
+  <strong>Setup steps:</strong>
+  <ol>
+    <li>Download <strong>icon16.png</strong>, <strong>icon48.png</strong>, <strong>icon128.png</strong> → save to <code>bookmark_ext/icons/</code></li>
+    <li>Reload the extension at <code>chrome://extensions</code> (click ↺) — the flower icon appears in your toolbar</li>
+    <li>Download <strong>bgm-square-logo.png</strong> → Square Dashboard → Account &amp; Settings → Business Information → Logo</li>
+    <li>Download <strong>bgm-square-banner.png</strong> → use as the cover image on your Square payment link page</li>
+    <li>Download <strong>bgm-donation-image.png</strong> → use as the image on your Square donation link (1200×800, 3:2 ratio)</li>
+  </ol>
+</div>
+
+<script>
+// ── Palette ────────────────────────────────────────────────────────────────
+const BG_TOP    = '#166534';   // dark forest green
+const BG_BOT    = '#14532d';   // deeper green
+const STEM      = '#4ade80';   // bright green
+const STEM_OL   = '#166534';   // stem outline
+const PETAL     = '#f472b6';   // hot pink
+const PETAL_OL  = '#be185d';   // dark pink
+const CENTER    = '#fbbf24';   // golden yellow
+const CENTER_OL = '#b45309';   // amber
+const WHITE     = '#ffffff';
+const OUTLINE   = '#1a1a1a';   // near-black cartoon outline
+const SPARK     = '#fde047';   // bright yellow sparkle
+
+// ── Rounded rect helper ────────────────────────────────────────────────────
+function rrect(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y,     x + w, y + r,     r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x,     y + h, x,     y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x,     y,     x + r, y,         r);
+  ctx.closePath();
+}
+
+// ── Main icon drawing ──────────────────────────────────────────────────────
+// Scissors emoji ✂️ centered on a dark-green rounded-square background.
+// Simple, crisp, and instantly recognisable at every size.
+function drawIcon(canvas, size) {
+  const ctx = canvas.getContext('2d');
+  canvas.width  = size;
+  canvas.height = size;
+  ctx.clearRect(0, 0, size, size);
+
+  const S = size;
+
+  // Background gradient
+  const bg = ctx.createLinearGradient(0, 0, S, S);
+  bg.addColorStop(0, BG_TOP);
+  bg.addColorStop(1, BG_BOT);
+  rrect(ctx, 0, 0, S, S, S * 0.18);
+  ctx.fillStyle = bg;
+  ctx.fill();
+
+  // Scissors emoji — scale font to ~65% of the tile so it has breathing room
+  const fontSize = Math.round(S * 0.65);
+  ctx.font = `${fontSize}px serif`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('✂️', S * 0.52, S * 0.52);  // slight offset centres the glyph visually
+}
+
+// ── Square logo (1000×1000) ────────────────────────────────────────────────
+function drawSquareLogo(canvas) {
+  const S = 1000;
+  canvas.width  = S;
+  canvas.height = S;
+  const ctx = canvas.getContext('2d');
+
+  const bg = ctx.createLinearGradient(0, 0, S, S);
+  bg.addColorStop(0, BG_TOP);
+  bg.addColorStop(1, BG_BOT);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, S, S);
+
+  // Subtle decorative circles
+  ctx.globalAlpha = 0.07;
+  ctx.fillStyle = '#4ade80';
+  ctx.beginPath(); ctx.arc(S * 0.90, S * 0.12, S * 0.42, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(S * 0.08, S * 0.88, S * 0.30, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Render icon into a temp canvas, then stamp it centered in upper area
+  const iconSize = 480;
+  const ic = document.createElement('canvas');
+  drawIcon(ic, iconSize);
+  const ix = (S - iconSize) / 2;
+  const iy = S * 0.08;
+
+  ctx.save();
+  rrect(ctx, ix, iy, iconSize, iconSize, iconSize * 0.18);
+  ctx.clip();
+  ctx.drawImage(ic, ix, iy);
+  ctx.restore();
+
+  // App name
+  ctx.fillStyle = WHITE;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = `700 ${S * 0.065}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Bookmark Gardening', S / 2, S * 0.74);
+  ctx.fillText('Manager', S / 2, S * 0.82);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.50)';
+  ctx.font = `400 ${S * 0.026}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Dan Woodruff Consulting, LLC', S / 2, S * 0.94);
+}
+
+// ── Square banner (1200×400) ───────────────────────────────────────────────
+function drawSquareBanner(canvas) {
+  const W = 1200, H = 400;
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, BG_BOT);
+  bg.addColorStop(1, BG_TOP);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = '#4ade80';
+  ctx.beginPath(); ctx.arc(W * 0.88, H * 0.22, H * 0.90, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W * 0.07, H * 0.78, H * 0.52, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Icon on left
+  const iconSize = Math.round(H * 0.70);
+  const ic = document.createElement('canvas');
+  drawIcon(ic, iconSize);
+  const ix = H * 0.18;
+  const iy = (H - iconSize) / 2;
+
+  ctx.save();
+  rrect(ctx, ix, iy, iconSize, iconSize, iconSize * 0.18);
+  ctx.clip();
+  ctx.drawImage(ic, ix, iy);
+  ctx.restore();
+
+  const tx = ix + iconSize + H * 0.18;
+  ctx.textAlign    = 'left';
+  ctx.textBaseline = 'alphabetic';
+
+  ctx.fillStyle = 'rgba(255,255,255,0.60)';
+  ctx.font = `500 ${H * 0.048}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('FREE CHROME EXTENSION', tx, H * 0.34);
+
+  ctx.fillStyle = WHITE;
+  ctx.font = `700 ${H * 0.148}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Bookmark', tx, H * 0.57);
+  ctx.fillText('Gardening Manager', tx, H * 0.77);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.48)';
+  ctx.font = `400 ${H * 0.038}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Support this extension via Square · Dan Woodruff Consulting, LLC', tx, H * 0.91);
+}
+
+// ── Square donation image (1200×800) ──────────────────────────────────────
+function drawDonationImage(canvas) {
+  const W = 1200, H = 800;
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background gradient
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, BG_TOP);
+  bg.addColorStop(1, BG_BOT);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle decorative circles
+  ctx.globalAlpha = 0.07;
+  ctx.fillStyle = '#4ade80';
+  ctx.beginPath(); ctx.arc(W * 0.90, H * 0.10, H * 0.80, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W * 0.06, H * 0.92, H * 0.45, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Icon centered in upper portion
+  const iconSize = 300;
+  const ic = document.createElement('canvas');
+  drawIcon(ic, iconSize);
+  const ix = (W - iconSize) / 2;
+  const iy = H * 0.08;
+
+  ctx.save();
+  rrect(ctx, ix, iy, iconSize, iconSize, iconSize * 0.18);
+  ctx.clip();
+  ctx.drawImage(ic, ix, iy);
+  ctx.restore();
+
+  // App name
+  ctx.fillStyle = WHITE;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = `700 ${H * 0.082}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Bookmark Gardening Manager', W / 2, H * 0.67);
+
+  // Tagline
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.font = `400 ${H * 0.040}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Help make this product better — toss me a treat!', W / 2, H * 0.76);
+
+  // Divider
+  ctx.strokeStyle = 'rgba(255,255,255,0.20)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(W * 0.30, H * 0.84);
+  ctx.lineTo(W * 0.70, H * 0.84);
+  ctx.stroke();
+
+  // Company name
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.font = `400 ${H * 0.030}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Dan Woodruff Consulting, LLC', W / 2, H * 0.92);
+}
+
+// ── Card builder ───────────────────────────────────────────────────────────
+function makeCard(canvas, displayW, displayH, label, sub, filename) {
+  canvas.style.width  = displayW + 'px';
+  canvas.style.height = displayH + 'px';
+  canvas.style.imageRendering = canvas.width <= 16 ? 'pixelated' : 'auto';
+
+  const btn = document.createElement('button');
+  btn.className   = 'btn';
+  btn.textContent = 'Download ' + filename;
+  btn.onclick = () => {
+    const a = document.createElement('a');
+    a.download = filename;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+
+  const card = document.createElement('div');
+  card.className = 'card';
+  const lbl = document.createElement('span'); lbl.className = 'card-label'; lbl.textContent = label;
+  const s   = document.createElement('span'); s.className   = 'card-sub';   s.textContent   = sub;
+  card.append(lbl, canvas, s, btn);
+  return card;
+}
+
+// ── Render extension icons ─────────────────────────────────────────────────
+const extRow = document.getElementById('ext-icons');
+[[16, 80], [48, 96], [128, 128]].forEach(([sz, disp]) => {
+  const c = document.createElement('canvas');
+  drawIcon(c, sz);
+  extRow.appendChild(makeCard(c, disp, disp, `${sz} × ${sz}`, 'Extension icon', `icon${sz}.png`));
+});
+
+// ── Render Square assets ───────────────────────────────────────────────────
+const sqRow = document.getElementById('square-icons');
+
+const logo = document.createElement('canvas');
+drawSquareLogo(logo);
+sqRow.appendChild(makeCard(logo, 150, 150, '1000 × 1000', 'Square profile / logo', 'bgm-square-logo.png'));
+
+const banner = document.createElement('canvas');
+drawSquareBanner(banner);
+sqRow.appendChild(makeCard(banner, 380, Math.round(380 * 400 / 1200), '1200 × 400', 'Square payment link banner', 'bgm-square-banner.png'));
+
+const donation = document.createElement('canvas');
+drawDonationImage(donation);
+sqRow.appendChild(makeCard(donation, 300, 200, '1200 × 800', 'Square donation link image', 'bgm-donation-image.png'));
+</script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Primary SEO -->
+  <title>Bookmark Gardening Manager — Free Chrome Extension to Clean Dead Links & Unused Bookmarks</title>
+  <meta name="description" content="Free Chrome extension that scans for dead links, removes unused bookmarks, and organizes your collection by folder or domain. No account, no tracking. Built by Dan Woodruff Consulting, LLC.">
+  <meta name="keywords" content="bookmark cleaner, dead link checker, remove dead bookmarks, chrome bookmark manager, unused bookmarks, bookmark audit, free chrome extension, bookmark organizer, broken link finder, bookmark pruner">
+  <meta name="author" content="Dan Woodruff Consulting, LLC">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://danwoodruffconsulting.github.io/bookmark-gardening-manager/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Bookmark Gardening Manager — Free Chrome Dead Link & Bookmark Cleaner">
+  <meta property="og:description" content="Scan every bookmark for dead links, find ones you haven't visited in months, and organize your collection — free, no sign-in required.">
+  <meta property="og:url" content="https://danwoodruffconsulting.github.io/bookmark-gardening-manager/">
+  <meta property="og:image" content="https://danwoodruffconsulting.github.io/bookmark-gardening-manager/social-preview.png">
+  <meta property="og:site_name" content="Dan Woodruff Consulting, LLC">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bookmark Gardening Manager — Free Chrome Extension">
+  <meta name="twitter:description" content="Scan every bookmark for dead links, find unused ones, and organize by folder or domain. Free, no account needed.">
+  <meta name="twitter:image" content="https://danwoodruffconsulting.github.io/bookmark-gardening-manager/social-preview.png">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Bookmark Gardening Manager",
+    "operatingSystem": "Chrome",
+    "applicationCategory": "BrowserApplication",
+    "applicationSubCategory": "Productivity",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free Chrome extension that audits dead links, tracks bookmark usage, and organizes your bookmark collection by folder or domain. No account required, no data leaves your browser.",
+    "author": {
+      "@type": "Organization",
+      "name": "Dan Woodruff Consulting, LLC",
+      "url": "https://danwoodruffconsulting.github.io"
+    },
+    "url": "https://danwoodruffconsulting.github.io/bookmark-gardening-manager/",
+    "downloadUrl": "https://chrome.google.com/webstore/detail/bookmark-gardening-manager/YOUR_EXTENSION_ID",
+    "softwareVersion": "2.1.0",
+    "featureList": [
+      "Dead link scanner — finds 404s and unreachable URLs",
+      "Unused bookmark finder — tracks visit history",
+      "Group by folder or domain",
+      "One-click bulk removal",
+      "No account required",
+      "No data leaves your browser"
+    ],
+    "keywords": "bookmark cleaner, dead link checker, unused bookmarks, bookmark audit, chrome extension, bookmark organizer",
+    "sameAs": "https://github.com/danwoodruffconsulting/bookmark-gardening-manager"
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #1a1a1a;
+      line-height: 1.6;
+      background: #fff;
+    }
+    a { color: #2563eb; }
+    .container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d6a4f 100%);
+      color: #fff;
+      padding: 64px 0 56px;
+      text-align: center;
+    }
+    .hero-icon { font-size: 56px; margin-bottom: 16px; display: block; }
+    .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 12px; line-height: 1.2; }
+    .hero .tagline { font-size: 1.15rem; opacity: 0.88; max-width: 520px; margin: 0 auto 32px; }
+    .cta-wrap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-block;
+      background: #4ade80;
+      color: #0f2a1a;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+    .btn-secondary {
+      display: inline-block;
+      background: transparent;
+      color: #fff;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 2px solid rgba(255,255,255,0.5);
+    }
+    .free-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+    }
+
+    section { padding: 56px 0; }
+    section + section { border-top: 1px solid #f0f0f0; }
+    h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 16px; }
+    h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; }
+    p { margin-bottom: 14px; color: #333; }
+    p:last-child { margin-bottom: 0; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-top: 28px;
+    }
+    .feature-card {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 24px;
+      border: 1px solid #e8edf2;
+    }
+    .feature-icon { font-size: 1.8rem; margin-bottom: 10px; display: block; }
+
+    .privacy-list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .privacy-list li {
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      border-radius: 99px;
+      padding: 6px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .story blockquote {
+      border-left: 4px solid #2d6a4f;
+      padding-left: 20px;
+      margin: 20px 0;
+      color: #444;
+      font-style: italic;
+      font-size: 1.05rem;
+    }
+
+    .donate-section {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+    }
+    .donate-section h2 { margin-bottom: 10px; }
+    .donate-section p { max-width: 500px; margin: 0 auto 20px; }
+    .btn-donate {
+      display: inline-block;
+      background: #f59e0b;
+      color: #fff;
+      font-weight: 700;
+      padding: 12px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    footer {
+      padding: 32px 0;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #888;
+      border-top: 1px solid #eee;
+    }
+    footer a { color: #888; }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="container">
+      <span class="free-badge">100% Free — No Account Required</span>
+      <span class="hero-icon">✂️</span>
+      <h1>Stop Drowning in Bookmarks You'll Never Use</h1>
+      <p class="tagline">Bookmark Gardening Manager scans for dead links, finds bookmarks you haven't visited in months, and organizes everything — all inside Chrome, with no data leaving your browser.</p>
+      <div class="cta-wrap">
+        <a class="btn-primary" href="https://chrome.google.com/webstore/detail/bookmark-gardening-manager/YOUR_EXTENSION_ID" rel="noopener">
+          Add to Chrome — It's Free
+        </a>
+        <a class="btn-secondary" href="#story">Our Story</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="container">
+      <h2>What It Does</h2>
+      <p>Three tools in one extension — no fluff, no upsells.</p>
+      <div class="features-grid">
+        <article class="feature-card">
+          <span class="feature-icon">🔍</span>
+          <h3>Dead Link Audit</h3>
+          <p>Scans every bookmark and flags 404s, gone pages, and unreachable URLs. Remove them all in one click.</p>
+        </article>
+        <article class="feature-card">
+          <span class="feature-icon">📅</span>
+          <h3>Unused Bookmark Finder</h3>
+          <p>Tracks which links you actually visit. Find bookmarks you haven't opened in 30, 60, 90 days — or ever.</p>
+        </article>
+        <article class="feature-card">
+          <span class="feature-icon">📁</span>
+          <h3>Group &amp; Clean</h3>
+          <p>Browse your entire collection organized by folder or domain. Delete entire clusters at once.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="container">
+      <h2>Your Bookmarks Stay Yours</h2>
+      <p>Every scan runs entirely in your browser. Nothing is sent to any server — not your bookmark titles, not your URLs, not your visit history.</p>
+      <ul class="privacy-list" aria-label="Privacy guarantees">
+        <li>No account required</li>
+        <li>No data leaves your browser</li>
+        <li>No analytics or tracking</li>
+        <li>No ads</li>
+        <li>Open for inspection</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="story" class="story">
+    <div class="container">
+      <h2>Why I Built This</h2>
+      <p>
+        I'm Dan Woodruff, an independent consultant. After years of saving research links, client sites,
+        tool references, and "read later" articles, I ended up with over 800 bookmarks in Chrome.
+        Maybe 40% of them were actually useful. The rest were dead pages, sites that had moved,
+        articles behind new paywalls, or links I'd saved during a project that ended years ago.
+      </p>
+      <blockquote>
+        "I kept meaning to clean them up manually. But clicking through hundreds of links one at a time
+        is exactly the kind of task that never makes it onto the to-do list."
+      </blockquote>
+      <p>
+        I looked for a free tool that would do this automatically inside Chrome. The options I found either
+        required creating an account, synced my data to an external server, or cost money for basic features.
+        None of that felt right for a utility this simple.
+      </p>
+      <p>
+        So I built Bookmark Gardening Manager. It runs completely inside your browser, costs nothing,
+        and does the one thing bookmark managers should do: help you keep only what's actually useful.
+      </p>
+      <p>— <strong>Dan Woodruff</strong>, Dan Woodruff Consulting, LLC</p>
+    </div>
+  </section>
+
+  <section id="donate">
+    <div class="container">
+      <div class="donate-section">
+        <h2>&#9829; Support This Extension</h2>
+        <p>
+          Bookmark Gardening Manager is free and will stay free. If it saved you an hour of tedious
+          cleanup and you'd like to say thanks, a small donation keeps the lights on.
+        </p>
+        <!-- Replace href with your Square donation link -->
+        <a class="btn-donate" href="https://square.link/YOUR_SQUARE_LINK" rel="noopener">
+          Buy Dan a Coffee
+        </a>
+        <p style="margin-top:12px; font-size:0.85rem; color:#92400e;">
+          Secure payment via Square &nbsp;&middot;&nbsp; No account needed &nbsp;&middot;&nbsp; Any amount appreciated
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>
+        &copy; 2025 <a href="https://github.com/danwoodruffconsulting">Dan Woodruff Consulting, LLC</a>
+        &nbsp;&middot;&nbsp;
+        <a href="https://github.com/danwoodruffconsulting/bookmark-gardening-manager">GitHub</a>
+        &nbsp;&middot;&nbsp;
+        <a href="https://chrome.google.com/webstore/detail/bookmark-gardening-manager/YOUR_EXTENSION_ID">Chrome Web Store</a>
+        &nbsp;&middot;&nbsp;
+        <a href="mailto:idanwoodruff@gmail.com">Contact</a>
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

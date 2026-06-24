@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bookmark Gardening Manager</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <span class="header-icon">✂️</span>
+    <h1>Bookmark Gardening Manager</h1>
+    <a id="btn-donate" class="donate-btn" href="#">♥ Donate</a>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="audit">Audit</button>
+    <button class="tab" data-tab="usage">Usage</button>
+    <button class="tab" data-tab="report">Report</button>
+  </nav>
+
+  <!-- ── AUDIT TAB ─────────────────────────────────────────── -->
+  <div class="panel active" id="panel-audit">
+    <p class="desc">Scan every bookmark and remove ones whose URLs are dead (404, gone, or unreachable).</p>
+
+    <button id="btn-audit" class="btn primary full">Scan for Dead Links</button>
+
+    <div id="audit-progress" class="progress-wrap hidden">
+      <div class="progress-track"><div id="audit-bar" class="progress-fill"></div></div>
+      <span id="audit-progress-text" class="progress-label">Checking 0 of 0…</span>
+    </div>
+
+    <p id="audit-scan-note" class="scan-note hidden"></p>
+
+    <div id="audit-results" class="results hidden">
+      <div id="audit-dead-section" class="hidden">
+        <div class="results-header">
+          <span id="audit-count" class="count-label"></span>
+          <button id="btn-delete-dead" class="btn danger">Remove Dead</button>
+        </div>
+        <ul id="dead-list" class="bm-list"></ul>
+      </div>
+      <div id="audit-login-section" class="hidden">
+        <div class="section-divider">Requires Login</div>
+        <div class="results-header">
+          <span id="audit-login-count" class="count-label"></span>
+          <button id="btn-delete-login" class="btn danger">Remove Login-Required</button>
+        </div>
+        <ul id="login-list" class="bm-list"></ul>
+      </div>
+    </div>
+
+    <div id="audit-empty" class="empty-state hidden">
+      <span class="check-icon">✓</span> All bookmarks are valid!
+    </div>
+  </div>
+
+  <!-- ── USAGE TAB ──────────────────────────────────────────── -->
+  <div class="panel" id="panel-usage">
+    <p class="desc">Usage is tracked each time you visit a bookmarked URL. Remove ones you haven't opened within the threshold below.</p>
+
+    <div class="control-row">
+      <label for="threshold">Unused for more than</label>
+      <select id="threshold">
+        <option value="30">30 days</option>
+        <option value="60">60 days</option>
+        <option value="90" selected>90 days</option>
+        <option value="180">6 months</option>
+        <option value="365">1 year</option>
+        <option value="never">Never visited</option>
+      </select>
+    </div>
+
+    <button id="btn-scan-unused" class="btn primary full">Find Unused Bookmarks</button>
+
+    <div id="usage-results" class="results hidden">
+      <div class="results-header">
+        <span id="usage-count" class="count-label"></span>
+        <button id="btn-delete-unused" class="btn danger">Remove Unused</button>
+      </div>
+      <ul id="unused-list" class="bm-list"></ul>
+    </div>
+
+    <div id="usage-empty" class="empty-state hidden">
+      <span class="check-icon">✓</span> No unused bookmarks in that window.
+    </div>
+
+    <p class="note">Tracking began when the extension was first installed. Chrome's own browsing history (typically up to 90 days) is also used to fill in visits that occurred before installation.</p>
+  </div>
+
+  <!-- ── REPORT TAB ─────────────────────────────────────────── -->
+  <div class="panel" id="panel-report">
+    <p class="desc">Explore bookmarks by group and delete entire clusters at once.</p>
+
+    <div class="control-row">
+      <label for="group-by">Group by</label>
+      <select id="group-by">
+        <option value="folder">Folder</option>
+        <option value="domain">Domain</option>
+      </select>
+    </div>
+
+    <button id="btn-report" class="btn primary full">Generate Report</button>
+
+    <div id="report-results" class="results hidden">
+      <div id="report-groups"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
