@@ -6,8 +6,8 @@
       https://chrome.google.com/webstore/devconsole (one-time $5 developer fee required).
       Paste the ID to Claude to update all `YOUR_EXTENSION_ID` placeholders.
 
-- [ ] **Square donation link** — paste your Square payment/donation URL to Claude
-      to update all `YOUR_SQUARE_LINK` placeholders in docs/index.html and landing-page.html.
+- [x] **Square donation link** — DONE. https://square.link/u/edbLSm7R is wired into
+      popup.js, docs/index.html, and landing-page.html.
 
 ## Domain — danwoodruffconsulting.com
 
@@ -41,8 +41,6 @@ landing page (e.g. danwoodruffconsulting.com/bookmark-gardening-manager/), Claud
 | File | Placeholder | Needs |
 |------|-------------|-------|
 | docs/index.html | YOUR_EXTENSION_ID | Chrome Web Store ID |
-| docs/index.html | YOUR_SQUARE_LINK | Square donation URL |
 | landing-page.html | YOUR_EXTENSION_ID | Chrome Web Store ID |
-| landing-page.html | YOUR_SQUARE_LINK | Square donation URL |
 | store-listing.md | Support URL | GitHub repo URL (already set) |
 | store-listing.md | Homepage URL | danwoodruffconsulting.com path |
