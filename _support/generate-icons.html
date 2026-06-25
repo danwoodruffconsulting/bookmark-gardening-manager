@@ -67,7 +67,7 @@
 
 <header>
   <h1>✂️ Bookmark Gardening Manager — Icon Generator</h1>
-  <p>Open this file in Chrome. Click each Download button to save the PNG files, then place the extension icons in <code>bookmark_ext/icons/</code> and upload the Square assets to your payment dashboard.</p>
+  <p>Open this file in Chrome. Click each Download button to save the PNG files: place the extension icons in <code>bookmark_ext/icons/</code>, upload the Square assets to your payment dashboard, and upload the Chrome Web Store listing assets to the developer console.</p>
 </header>
 
 <div class="section">
@@ -80,6 +80,11 @@
   <div class="row" id="square-icons"></div>
 </div>
 
+<div class="section">
+  <h2>Chrome Web Store Listing Assets</h2>
+  <div class="row" id="store-assets"></div>
+</div>
+
 <div class="section instructions">
   <strong>Setup steps:</strong>
   <ol>
@@ -88,6 +93,9 @@
     <li>Download <strong>bgm-square-logo.png</strong> → Square Dashboard → Account &amp; Settings → Business Information → Logo</li>
     <li>Download <strong>bgm-square-banner.png</strong> → use as the cover image on your Square payment link page</li>
     <li>Download <strong>bgm-donation-image.png</strong> → use as the image on your Square donation link (1200×800, 3:2 ratio)</li>
+    <li>Download <strong>bgm-screenshot-1280x800.png</strong> → Chrome Web Store listing → <em>Screenshots</em> (this is the one <u>required</u> image field)</li>
+    <li>Download <strong>bgm-promo-small-440x280.png</strong> → Chrome Web Store listing → <em>Small promo tile</em> (optional)</li>
+    <li>Download <strong>bgm-promo-marquee-1400x560.png</strong> → Chrome Web Store listing → <em>Marquee promo tile</em> (optional)</li>
   </ol>
 </div>
 
@@ -304,6 +312,168 @@ function drawDonationImage(canvas) {
   ctx.fillText('Dan Woodruff Consulting, LLC', W / 2, H * 0.92);
 }
 
+// ── Chrome Web Store: Screenshot / feature graphic (1280×800) ───────────────
+function drawScreenshot(canvas) {
+  const W = 1280, H = 800;
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, BG_TOP);
+  bg.addColorStop(1, BG_BOT);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.globalAlpha = 0.07;
+  ctx.fillStyle = '#4ade80';
+  ctx.beginPath(); ctx.arc(W * 0.92, H * 0.10, H * 0.55, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W * 0.05, H * 0.94, H * 0.40, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Icon top-center
+  const iconSize = 150;
+  const ic = document.createElement('canvas');
+  drawIcon(ic, iconSize);
+  const ix = (W - iconSize) / 2, iy = H * 0.07;
+  ctx.save();
+  rrect(ctx, ix, iy, iconSize, iconSize, iconSize * 0.18);
+  ctx.clip();
+  ctx.drawImage(ic, ix, iy);
+  ctx.restore();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+
+  ctx.fillStyle = WHITE;
+  ctx.font = `700 ${H * 0.072}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Bookmark Gardening Manager', W / 2, H * 0.34);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.font = `400 ${H * 0.032}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Free Chrome bookmark cleaner — no sign-in, no tracking', W / 2, H * 0.40);
+
+  // Three feature rows
+  const feats = [
+    ['\u{1F50D}', 'Dead Link Audit', 'Flag 404s & offline pages, remove them in one click'],
+    ['\u{1F4C5}', 'Unused Bookmark Finder', 'Surface links you haven’t opened in 30/60/90 days'],
+    ['\u{1F4C1}', 'Group & Report', 'Browse by folder or domain, delete clusters at once'],
+  ];
+  const rowH = H * 0.135, startY = H * 0.50, cardW = W * 0.70, cardX = (W - cardW) / 2;
+  feats.forEach((f, i) => {
+    const y = startY + i * rowH;
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    rrect(ctx, cardX, y, cardW, rowH * 0.82, 14);
+    ctx.fill();
+
+    ctx.textAlign = 'left';
+    ctx.font = `${rowH * 0.42}px serif`;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(f[0], cardX + 28, y + rowH * 0.41);
+
+    ctx.fillStyle = WHITE;
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = `700 ${rowH * 0.26}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.fillText(f[1], cardX + 100, y + rowH * 0.34);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.70)';
+    ctx.font = `400 ${rowH * 0.20}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.fillText(f[2], cardX + 100, y + rowH * 0.60);
+    ctx.textAlign = 'center';
+  });
+
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.font = `400 ${H * 0.026}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Dan Woodruff Consulting, LLC', W / 2, H * 0.965);
+}
+
+// ── Chrome Web Store: Small promo tile (440×280) ────────────────────────────
+function drawPromoSmall(canvas) {
+  const W = 440, H = 280;
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, BG_TOP);
+  bg.addColorStop(1, BG_BOT);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.globalAlpha = 0.08;
+  ctx.fillStyle = '#4ade80';
+  ctx.beginPath(); ctx.arc(W * 0.90, H * 0.15, H * 0.55, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  const iconSize = 96;
+  const ic = document.createElement('canvas');
+  drawIcon(ic, iconSize);
+  const ix = (W - iconSize) / 2, iy = H * 0.10;
+  ctx.save();
+  rrect(ctx, ix, iy, iconSize, iconSize, iconSize * 0.18);
+  ctx.clip();
+  ctx.drawImage(ic, ix, iy);
+  ctx.restore();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = WHITE;
+  ctx.font = `700 ${H * 0.105}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Bookmark', W / 2, H * 0.66);
+  ctx.fillText('Gardening Manager', W / 2, H * 0.80);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.70)';
+  ctx.font = `400 ${H * 0.052}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Free Chrome bookmark cleaner', W / 2, H * 0.92);
+}
+
+// ── Chrome Web Store: Marquee promo tile (1400×560) ─────────────────────────
+function drawPromoMarquee(canvas) {
+  const W = 1400, H = 560;
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, BG_BOT);
+  bg.addColorStop(1, BG_TOP);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = '#4ade80';
+  ctx.beginPath(); ctx.arc(W * 0.85, H * 0.20, H * 0.80, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W * 0.10, H * 0.85, H * 0.50, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  const iconSize = Math.round(H * 0.55);
+  const ic = document.createElement('canvas');
+  drawIcon(ic, iconSize);
+  const ix = W * 0.10, iy = (H - iconSize) / 2;
+  ctx.save();
+  rrect(ctx, ix, iy, iconSize, iconSize, iconSize * 0.18);
+  ctx.clip();
+  ctx.drawImage(ic, ix, iy);
+  ctx.restore();
+
+  const tx = ix + iconSize + W * 0.05;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+
+  ctx.fillStyle = 'rgba(255,255,255,0.60)';
+  ctx.font = `500 ${H * 0.05}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('FREE CHROME EXTENSION', tx, H * 0.34);
+
+  ctx.fillStyle = WHITE;
+  ctx.font = `700 ${H * 0.13}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Bookmark', tx, H * 0.54);
+  ctx.fillText('Gardening Manager', tx, H * 0.72);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = `400 ${H * 0.042}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  ctx.fillText('Scan dead links · Find unused bookmarks · Organize by folder', tx, H * 0.88);
+}
+
 // ── Card builder ───────────────────────────────────────────────────────────
 function makeCard(canvas, displayW, displayH, label, sub, filename) {
   canvas.style.width  = displayW + 'px';
@@ -350,6 +520,21 @@ sqRow.appendChild(makeCard(banner, 380, Math.round(380 * 400 / 1200), '1200 × 4
 const donation = document.createElement('canvas');
 drawDonationImage(donation);
 sqRow.appendChild(makeCard(donation, 300, 200, '1200 × 800', 'Square donation link image', 'bgm-donation-image.png'));
+
+// ── Render Chrome Web Store listing assets ─────────────────────────────────
+const storeRow = document.getElementById('store-assets');
+
+const shot = document.createElement('canvas');
+drawScreenshot(shot);
+storeRow.appendChild(makeCard(shot, 384, 240, '1280 × 800', 'Screenshot (required)', 'bgm-screenshot-1280x800.png'));
+
+const promoSmall = document.createElement('canvas');
+drawPromoSmall(promoSmall);
+storeRow.appendChild(makeCard(promoSmall, 220, 140, '440 × 280', 'Small promo tile', 'bgm-promo-small-440x280.png'));
+
+const promoMarquee = document.createElement('canvas');
+drawPromoMarquee(promoMarquee);
+storeRow.appendChild(makeCard(promoMarquee, 350, Math.round(350 * 560 / 1400), '1400 × 560', 'Marquee promo tile', 'bgm-promo-marquee-1400x560.png'));
 </script>
 </body>
 </html>
