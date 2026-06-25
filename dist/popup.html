@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bookmark Gardening Manager</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <button id="btn-website" class="header-about" title="About &amp; Legal">✂️</button>
+    <h1><a id="btn-website-title" href="#" class="header-title-link">Bookmark Gardening Manager</a></h1>
+    <a id="btn-donate" class="donate-btn" href="#">♥ Donate</a>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="audit">Audit</button>
+    <button class="tab" data-tab="usage">Usage</button>
+    <button class="tab" data-tab="report">Report</button>
+  </nav>
+
+  <!-- ── AUDIT TAB ─────────────────────────────────────────── -->
+  <div class="panel active" id="panel-audit">
+    <p class="desc">Scan every bookmark and remove ones whose URLs are dead (404, gone, or unreachable).</p>
+
+    <button id="btn-audit" class="btn primary full">Scan for Broken Links</button>
+
+    <div id="audit-progress" class="progress-wrap hidden">
+      <div class="progress-track"><div id="audit-bar" class="progress-fill"></div></div>
+      <span id="audit-progress-text" class="progress-label">Checking 0 of 0…</span>
+    </div>
+
+    <p id="audit-scan-note" class="scan-note hidden"></p>
+
+    <div id="audit-results" class="results hidden">
+      <div id="audit-dead-section" class="hidden">
+        <div class="results-header">
+          <div class="results-header-left">
+            <span id="audit-count" class="count-label"></span>
+            <label class="select-all-label"><input type="checkbox" id="dead-select-all"> Select all</label>
+          </div>
+          <button id="btn-delete-dead" class="btn danger">Remove Dead</button>
+        </div>
+        <ul id="dead-list" class="bm-list"></ul>
+      </div>
+      <div id="audit-slow-section" class="hidden">
+        <div class="section-divider">Timed Out</div>
+        <div class="results-header">
+          <div class="results-header-left">
+            <span id="audit-slow-count" class="count-label"></span>
+            <label class="select-all-label"><input type="checkbox" id="slow-select-all"> Select all</label>
+          </div>
+          <button id="btn-delete-slow" class="btn danger">Remove Timed Out</button>
+        </div>
+        <ul id="slow-list" class="bm-list"></ul>
+      </div>
+      <div id="audit-login-section" class="hidden">
+        <div class="section-divider">Requires Login</div>
+        <div class="results-header">
+          <div class="results-header-left">
+            <span id="audit-login-count" class="count-label"></span>
+            <label class="select-all-label"><input type="checkbox" id="login-select-all"> Select all</label>
+          </div>
+          <button id="btn-delete-login" class="btn danger">Remove Login-Required</button>
+        </div>
+        <ul id="login-list" class="bm-list"></ul>
+      </div>
+    </div>
+
+    <div id="audit-empty" class="empty-state hidden">
+      <span class="check-icon">✓</span> All bookmarks are valid!
+    </div>
+  </div>
+
+  <!-- ── USAGE TAB ──────────────────────────────────────────── -->
+  <div class="panel" id="panel-usage">
+    <p class="desc">Usage is tracked each time you visit a bookmarked URL. Remove ones you haven't opened within the threshold below.</p>
+
+    <div class="control-row">
+      <label for="threshold">Unused for more than</label>
+      <select id="threshold">
+        <option value="30">30 days</option>
+        <option value="60">60 days</option>
+        <option value="90" selected>90 days</option>
+        <option value="180">6 months</option>
+        <option value="365">1 year</option>
+        <option value="never">Never visited</option>
+      </select>
+    </div>
+
+    <button id="btn-scan-unused" class="btn primary full">Find Unused Bookmarks</button>
+
+    <div id="usage-results" class="results hidden">
+      <div class="results-header">
+        <div class="results-header-left">
+          <span id="usage-count" class="count-label"></span>
+          <label class="select-all-label"><input type="checkbox" id="unused-select-all"> Select all</label>
+        </div>
+        <button id="btn-delete-unused" class="btn danger">Remove Unused</button>
+      </div>
+      <ul id="unused-list" class="bm-list"></ul>
+    </div>
+
+    <div id="usage-empty" class="empty-state hidden">
+      <span class="check-icon">✓</span> No unused bookmarks in that window.
+    </div>
+
+    <p class="note"><span id="usage-status"></span> Visit data is stored only on your device and never leaves your browser. It also reads your existing Chrome browsing history (which Chrome typically keeps for about 90 days).</p>
+  </div>
+
+  <!-- ── REPORT TAB ─────────────────────────────────────────── -->
+  <div class="panel" id="panel-report">
+    <p class="desc">Explore bookmarks by group and delete entire clusters at once.</p>
+
+    <div class="control-row">
+      <label for="group-by">Group by</label>
+      <select id="group-by">
+        <option value="folder">Folder</option>
+        <option value="domain">Website Domain</option>
+        <option value="smart-topic">Smart: By Topic</option>
+        <option value="smart-org">Smart: By Organization</option>
+        <option value="smart-type">Smart: By Site Type</option>
+      </select>
+    </div>
+
+    <button id="btn-report" class="btn primary full">Generate Report</button>
+
+    <div id="report-results" class="results hidden">
+      <div id="report-groups"></div>
+    </div>
+  </div>
+
+  <footer class="popup-footer">
+    <a id="btn-website-footer" href="#" class="footer-link">Legal &amp; About</a>
+  </footer>
+
+  <div id="resize-handle" title="Drag to resize"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
