@@ -184,14 +184,20 @@
       font-size: 1rem;
     }
 
-    #legal h3 {
+    #legal h3,
+    #privacy-policy h3 {
       margin-top: 24px;
       margin-bottom: 6px;
       font-size: 1rem;
       color: #1a1a1a;
     }
-    #legal p { font-size: 0.92rem; color: #555; }
+    #legal p,
+    #privacy-policy p { font-size: 0.92rem; color: #555; }
     #legal { background: #f8fafc; }
+    #privacy-policy ul { margin: 6px 0 6px 22px; font-size: 0.92rem; color: #555; }
+    #privacy-policy li { margin-bottom: 6px; }
+    .pp-effective { font-size: 0.85rem; color: #888; margin-bottom: 8px; }
+    .pp-donate { margin-top: 28px; text-align: center; }
 
     footer {
       padding: 32px 0;
@@ -366,6 +372,83 @@
     </div>
   </section>
 
+  <!-- ── PRIVACY POLICY ────────────────────────────────────────── -->
+  <section id="privacy-policy">
+    <div class="container">
+      <h2>Privacy Policy</h2>
+      <p class="pp-effective">Effective date: June 24, 2026 &nbsp;&middot;&nbsp; Dan Woodruff Consulting, LLC</p>
+
+      <p>
+        Bookmark Gardening Manager ("the extension") is designed to work entirely on your own
+        device. <strong>It does not collect, transmit, sell, or share any personal data.</strong>
+        All processing — including dead-link scanning, usage tracking, and bookmark organization —
+        happens locally within your copy of Chrome. No bookmark titles, URLs, browsing history, or
+        personal information is ever sent to Dan Woodruff Consulting, LLC or to any third party.
+      </p>
+
+      <h3>Data the extension accesses (and why)</h3>
+      <p>
+        To perform its single purpose — cleaning up and organizing bookmarks — the extension uses the
+        following Chrome permissions. Data accessed through them is used only on your device and is
+        never transmitted:
+      </p>
+      <ul>
+        <li><strong>Bookmarks:</strong> read your bookmarks to display, audit, and organize them, and
+          to remove bookmarks or folders you choose to delete.</li>
+        <li><strong>Browsing history:</strong> read the last-visited time of bookmarked pages so the
+          extension can identify bookmarks you haven't opened within a chosen time window. Only
+          bookmarked URLs are checked.</li>
+        <li><strong>Web navigation:</strong> detect when you open a page that matches one of your
+          bookmarks, so the extension can count how often each bookmark is actually used. Only the URL
+          is compared against your existing bookmarks.</li>
+        <li><strong>Local storage:</strong> store small amounts of data on your device — the install
+          date, per-bookmark visit counts and last-visited timestamps, and temporary interface state.
+          This never leaves your machine.</li>
+        <li><strong>Tabs:</strong> open a link in a new tab when you click a bookmark in a report or
+          open the optional donation page. The extension does not read tab contents or browsing
+          activity.</li>
+        <li><strong>Host access (all sites):</strong> the Dead Link Audit sends a network request to
+          each bookmarked URL to check whether the page still loads or returns an error. Only the
+          bookmark's own URL is requested; no page content is collected, stored, or transmitted
+          elsewhere.</li>
+      </ul>
+
+      <h3>No data collection or sharing</h3>
+      <p>
+        The extension contains no analytics, no advertising, and no tracking. It does not use remote
+        code. It does not transfer data to third parties, does not use data for any purpose unrelated
+        to its single purpose, and does not use data to determine creditworthiness or for lending
+        purposes. No account or sign-in is required.
+      </p>
+
+      <h3>Donations</h3>
+      <p>
+        Donations are optional and handled entirely by <strong>Square</strong> through an external
+        link. If you choose to donate, your payment is processed by Square under
+        <a href="https://squareup.com/us/en/legal/general/privacy" rel="noopener">Square's privacy
+        policy</a>. The extension itself never sees or stores your payment information.
+      </p>
+
+      <h3>Changes to this policy</h3>
+      <p>
+        If this policy changes, the updated version will be posted on this page with a new effective
+        date.
+      </p>
+
+      <h3>Contact</h3>
+      <p>
+        Questions about privacy may be directed to
+        <a href="mailto:dan@danwoodruffconsulting.com">dan@danwoodruffconsulting.com</a>.
+      </p>
+
+      <div class="pp-donate">
+        <a class="btn-donate" href="https://square.link/u/edbLSm7R" rel="noopener">
+          &#9829; Buy Dan a Coffee
+        </a>
+      </div>
+    </div>
+  </section>
+
   <footer>
     <div class="container">
       <p>
@@ -376,6 +459,8 @@
         <a href="https://chrome.google.com/webstore/detail/bookmark-gardening-manager/hncpebilhhjgfjdnghenmgobciihebhb">Chrome Web Store</a>
         &nbsp;&middot;&nbsp;
         <a href="#legal">Legal</a>
+        &nbsp;&middot;&nbsp;
+        <a href="#privacy-policy">Privacy Policy</a>
         &nbsp;&middot;&nbsp;
         <a href="mailto:dan@danwoodruffconsulting.com">Contact</a>
       </p>
