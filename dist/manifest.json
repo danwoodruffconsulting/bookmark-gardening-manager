@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Bookmark Gardening Manager",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Free bookmark cleaner for Chrome. Scan for dead links, remove unused bookmarks, and organize by folder or domain. No sign-in needed.",
   "permissions": [
     "bookmarks",
